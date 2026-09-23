@@ -98,22 +98,65 @@
 
 ---
 
-## ⚙️ Tính Năng Cấu Hình Hệ Thống (Admin Panel) — Đề Xuất Mới
+### ⚙️ Quản Trị Hệ Thống (`/api/admin`) — Đã Hoàn Thành
+- [x] `GET    /api/admin/users` — Lấy danh sách tất cả tài khoản
+- [x] `POST   /api/admin/users` — Tạo tài khoản mới (Admin / Nhân viên)
+- [x] `PUT    /api/admin/users/{id}` — Cập nhật họ tên, email, vai trò
+- [x] `PUT    /api/admin/users/{id}/reset-password` — Đặt lại mật khẩu
+- [x] `DELETE /api/admin/users/{id}` — Xóa tài khoản (bảo vệ chống tự xóa chính mình)
+- [x] `GET    /api/admin/system-info` — Thống kê tổng quan hệ thống (tổng user, booking, item, kho, kệ, ngăn, checkout)
+- [x] Tích hợp Cloudflare R2 Storage (AWS SDK v2 S3-compatible) cho lưu trữ file CSV lâu dài
+- [x] Tự động xóa file trên R2 khi hủy booking
+
+---
+
+## 🔧 Cần Cải Thiện
+
+### Bảo Mật
+- [x] Enforce `@PreAuthorize("hasRole('ROLE_ADMIN')")` trên các route admin
+- [ ] Thêm Rate Limiting (chống brute-force login)
+- [ ] Thêm `@Valid` cho tất cả request body chưa có
+
+### Nghiệp Vụ
+- [ ] Cho phép checkout linh hoạt hơn — hiện tại chỉ được checkout đúng ngày checkout date
+- [ ] Pagination cho `/api/product/all` (hiện tại trả toàn bộ)
+- [ ] Sort/Filter ở Repository layer thay vì in-memory tại Controller
+
+### Code Quality
+- [ ] Viết Unit Tests (Service layer) và Integration Tests (Controller layer)
+- [ ] Thêm `@Slf4j` logging thay thế `System.out.println` trong BookingServiceImpl
+- [ ] Chuẩn hóa error response format (hiện tại mỗi nơi trả lỗi theo cách khác nhau)
+- [ ] Thêm Swagger/OpenAPI documentation (`springdoc-openapi`)
+
+### Performance
+- [ ] Thêm Redis Cache cho các query thường xuyên (getAllProducts, getAllCompartments)
+- [ ] Lazy loading review — tránh N+1 query problem
+
+---
+
+## 💡 Tính Năng Tương Lai (Nice to Have)
+
+- [ ] Import/Export Excel (ngoài CSV)
+- [ ] QR code cho từng ngăn kệ — quét để xem thông tin
+- [ ] Audit Log — lưu lịch sử thao tác của từng user
+- [ ] Multi-warehouse support với phân quyền theo kho
+
+---
+
+## ⚙️ Tính Năng Cấu Hình Hệ Thống (Admin Panel) — Tiến Độ
 
 > Mục tiêu: Admin có UI tập trung để xem & quản lý hệ thống mà không cần truy cập DB hay file config.
 
 ### 👤 Module 1: Quản Lý Tài Khoản Nhân Viên
-**Route:** `GET/POST/PUT /api/admin/users`
-
-- [ ] `GET  /api/admin/users` — Danh sách tất cả users (id, username, profileName, email, role)
-- [ ] `POST /api/admin/users` — Tạo tài khoản nhân viên mới (dùng lại SignupRequest)
-- [ ] `PUT  /api/admin/users/{id}/role` — Đổi role (ADMIN ↔ STAFF)
-- [ ] `PUT  /api/admin/users/{id}/reset-password` — Admin reset mật khẩu cho nhân viên
-- [ ] `PUT  /api/admin/users/{id}/disable` — Vô hiệu hóa tài khoản (thêm field `enabled` vào User)
+**Route:** `GET/POST/PUT/DELETE /api/admin/users`
+- [x] `GET  /api/admin/users` — Danh sách tất cả users (id, username, profileName, email, role)
+- [x] `POST /api/admin/users` — Tạo tài khoản nhân viên mới (hỗ trợ ROLE_ADMIN, ROLE_STAFF)
+- [x] `PUT  /api/admin/users/{id}` — Cập nhật họ tên, email, vai trò (ADMIN ↔ STAFF)
+- [x] `PUT  /api/admin/users/{id}/reset-password` — Admin reset mật khẩu cho nhân viên
+- [x] `DELETE /api/admin/users/{id}` — Xóa người dùng (chặn tự xóa bản thân)
 
 ### 🏭 Module 2: Quản Lý Kho & Kệ
 **Route:** đã có `/api/warehouse`, `/api/shelf` — cần thêm UI frontend
-
 - [ ] Frontend: form tạo warehouse mới (tên, địa chỉ)
 - [ ] Frontend: form tạo shelf mới (tên, loại, tọa độ X/Y/Z, chọn warehouse)
 - [ ] Frontend: danh sách warehouse + số kệ, số ngăn trong mỗi kho
@@ -122,7 +165,6 @@
 
 ### 🔔 Module 3: Cấu Hình Thông Báo
 **Route:** `GET/PUT /api/admin/config`
-
 - [ ] `GET /api/admin/config` — Lấy cấu hình hiện tại
 - [ ] `PUT /api/admin/config` — Cập nhật cấu hình:
   - `checkoutReminderDays` — cảnh báo trước X ngày khi sắp đến hạn xuất (mặc định 3)
@@ -130,14 +172,14 @@
 
 ### 📊 Module 4: Thông Tin Hệ Thống (Read-only)
 **Route:** `GET /api/admin/system-info`
-
-- [ ] Trả về: tổng users, tổng kho, tổng kệ, tổng ngăn, tổng items đang lưu
+- [x] Trả về: tổng users, tổng kho, tổng kệ, tổng ngăn, tổng items đang lưu, tổng booking, tổng checkout
 - [ ] Tên môi trường (local / staging / production từ `spring.profiles.active`)
 - [ ] Thời gian server khởi động
 
-### Frontend Pages Cần Tạo
-- [ ] `/admin/users` — Trang quản lý tài khoản
-- [ ] `/admin/warehouses` — Trang quản lý kho & kệ
-- [ ] `/admin/config` — Trang cấu hình thông báo
-- [ ] `/admin/system` — Trang thông tin hệ thống
-- [ ] Sidebar menu "Cấu hình" chỉ hiện với ADMIN role
+### Frontend Pages
+- [x] `/admin` (Tab: Quản lý nhân viên) — Bảng danh sách, tạo mới, sửa, đổi pass, xóa
+- [x] `/admin` (Tab: Thông tin hệ thống) — Thống kê các chỉ số bằng thẻ số liệu trực quan
+- [x] Sidebar navigation & menu "Quản Trị Viên" trên Navbar (chỉ hiển thị với ROLE_ADMIN)
+- [ ] `/admin` (Tab: Quản lý kho & kệ)
+- [ ] `/admin` (Tab: Cấu hình hệ thống)
+

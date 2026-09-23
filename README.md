@@ -17,11 +17,13 @@ Hệ thống WMS (Warehouse Management System) cho phép quản lý kho hàng v�
 
 ### Tính năng chính
 - 📦 **Nhập kho** — Upload file CSV chứa danh sách hàng, tạo Booking và Items tự động
+- ☁️ **Lưu trữ đám mây (Cloudflare R2)** — Lưu trữ file CSV trên Object Storage (S3-compatible), không bị mất khi container restart
 - 🗃️ **Quản lý vị trí** — Phân kệ 3D: Warehouse → Shelf → Compartment với tọa độ (x, y, z)
 - 🚚 **Xuất kho** — Flow: Checkout → Xác nhận → Cập nhật tồn kho, với Pessimistic Locking chống race condition
 - 🔔 **Thông báo real-time** — WebSocket/STOMP: nhắc nhở checkout, cảnh báo sắp hết hạn
 - 📊 **Báo cáo PDF** — JasperReports: phiếu nhập, phiếu giao hàng, phiếu xuất kho
 - 🔐 **Bảo mật** — JWT Stateless, phân quyền ROLE_ADMIN / ROLE_STAFF
+- 👑 **Admin Panel** — Quản trị tài khoản nhân viên (CRUD, reset password), xem thống kê hệ thống toàn diện
 - ⏰ **Tự động hóa** — Scheduler nhắc checkout (30 phút/lần), dọn dẹp dữ liệu cũ (0h/ngày)
 
 ---
@@ -128,6 +130,10 @@ docker run -p 8080:8080 \
 | `DB_PASSWORD` | Mật khẩu DB | _(rỗng)_ |
 | `JWT_SECRET` | Secret key ký JWT (≥ 32 ký tự) | _(xem example)_ |
 | `ALLOWED_ORIGINS` | CORS origins, cách nhau bằng dấu phẩy | `http://localhost:3000` |
+| `R2_ACCOUNT_ID` | Cloudflare Account ID | `your-cloudflare-account-id` |
+| `R2_ACCESS_KEY` | Cloudflare R2 Access Key ID | `your-r2-access-key-id` |
+| `R2_SECRET_KEY` | Cloudflare R2 Secret Access Key | `your-r2-secret-access-key` |
+| `R2_BUCKET` | Tên Cloudflare R2 Bucket | `your-bucket-name` |
 
 ---
 

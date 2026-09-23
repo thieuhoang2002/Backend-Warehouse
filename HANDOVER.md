@@ -44,6 +44,12 @@ spring.datasource.password=
 
 # JWT Secret - phải >= 32 ký tự
 backend.warehouse.app.jwtSecret=my-super-secret-key-for-wms-app-2024
+
+# Cloudflare R2 Storage (S3-compatible)
+r2.account-id=your-cloudflare-account-id
+r2.access-key=your-r2-access-key-id
+r2.secret-key=your-r2-secret-access-key
+r2.bucket=your-bucket-name
 ```
 
 ### Bước 4: Chạy backend

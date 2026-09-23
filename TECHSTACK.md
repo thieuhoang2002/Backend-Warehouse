@@ -38,6 +38,13 @@
 |----------|-----------|----------|
 | **JasperReports** | 6.20.1 | Xuất báo cáo PDF từ template `.jrxml` |
 | **Apache Commons CSV** | 1.10.0 | Parse file CSV nhập kho |
+| **AWS SDK v2 S3** (`software.amazon.awssdk:s3`) | 2.25.60 | Kết nối Cloudflare R2 (S3 API), upload/download/xóa file |
+
+## Cloud Storage
+
+| Dịch vụ | Mục đích | Ưu điểm |
+|---------|----------|---------|
+| **Cloudflare R2** | Lưu trữ file CSV booking | Egress miễn phí, 10GB lưu trữ free, không mất file khi container restart |
 
 ## Communication
 
