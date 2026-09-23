@@ -9,13 +9,8 @@ import com.backend.warehouse.repository.ItemRepository;
 import io.jsonwebtoken.io.IOException;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
@@ -40,63 +35,47 @@ public class BookingServiceImpl implements BookingService {
 
 	@Autowired
 	private ItemRepository itemRepository;
-	
+
 	@Autowired
 	private ItemService itemservice;
 
+	@Autowired
+	private R2StorageService r2StorageService;
+
 	private String[] header = { "Name", "Type", "Quantity", "Weight (g)", "Checkin Date", "Checkout Date", "Image", "Useremail", "Delivery" };
 
-	private final String uploadDir = "uploads/";
-	
 	@Override
 	@Transactional
 	public void saveFormData(MultipartFile file) throws IOException, java.io.IOException {
 
-		Path uploadPath = Paths.get(uploadDir);
-		if (!Files.exists(uploadPath)) {
-			Files.createDirectories(uploadPath);
-		}
+		// 1. Upload file lên Cloudflare R2, lấy key (tên object)
+		String r2Key = r2StorageService.uploadFile(file);
 
-		String originalFileName = file.getOriginalFilename();
-		String fileName = originalFileName;
-		Path filePath = uploadPath.resolve(fileName);
-
-		int count = 1;
-		while (Files.exists(filePath)) {
-			String newFileName = String.format("%s_%s.%s",
-					originalFileName.substring(0, originalFileName.lastIndexOf(".")),
-					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")),
-					originalFileName.substring(originalFileName.lastIndexOf(".") + 1));
-			filePath = uploadPath.resolve(newFileName);
-			count++;
-		}
-
-		Files.copy(file.getInputStream(), filePath);
-
+		// 2. Tạo booking, lưu key R2 thay vì đường dẫn local
 		Booking booking = new Booking();
-		booking.setExcelFile(filePath.toString());
-		
+		booking.setExcelFile(r2Key);
+
+		// 3. Đọc CSV lần 1: lấy email khách hàng + referenceNo
 		if (file != null && !file.isEmpty()) {
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
 					CSVParser csvParser = new CSVParser(reader,
 							CSVFormat.DEFAULT.builder().setHeader(header).setSkipHeaderRecord(true).build())) {
 
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 				for (CSVRecord csvRecord : csvParser) {
 					booking.setCustomerEmail(csvRecord.get("Useremail"));
 				}
 			}
-			
+
 			Random random = new Random();
 			Long randomNumber = 10000 + random.nextLong(90000);
 			booking.setReferenceNo(randomNumber);
 		}
 
-
 		Booking savedBooking = bookingRepository.save(booking);
 
-		System.out.println("File đã được lưu vào: " + filePath.toString());
+		System.out.println("File đã được upload lên R2 với key: " + r2Key);
 
+		// 4. Đọc CSV lần 2: tạo các Item
 		if (file != null && !file.isEmpty()) {
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
 					CSVParser csvParser = new CSVParser(reader,
@@ -111,28 +90,18 @@ public class BookingServiceImpl implements BookingService {
 					item.setCheckin(LocalDate.parse(csvRecord.get("Checkin Date"), formatter));
 					item.setCheckout(LocalDate.parse(csvRecord.get("Checkout Date"), formatter));
 					String image = csvRecord.get("Image");
-					if(image.isEmpty()) {
-						item.setImage(null);
-					}
-					else {
-						item.setImage(image);	
-					}
+					item.setImage(image.isEmpty() ? null : image);
 					item.setBooking(savedBooking);
 					item.setWeight(Float.parseFloat(csvRecord.get("Weight (g)").replace(".", "")));
-					item.setCompartments(null);
 					String delivery = csvRecord.get("Delivery");
-					if(delivery.isEmpty()) {
-						item.setDelivery(null);
-					}
-					else {
-						item.setDelivery(delivery);	
-					}
+					item.setDelivery(delivery.isEmpty() ? null : delivery);
 					item.setStatus("Đang lưu kho");
 					itemRepository.save(item);
 				}
 			}
 		}
 	}
+
 
 	public String formatId(Long id) {
 	    if (id < 10) {

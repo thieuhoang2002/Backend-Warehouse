@@ -1,4 +1,4 @@
-﻿spring.application.name=Backend-Warehouse
+spring.application.name=Backend-Warehouse
 
 # ------------------------------------------------------------------------------
 # Database Configuration (MySQL / TiDB)
@@ -28,3 +28,22 @@ spring.task.scheduling.enabled=true
 # Chuoi bi mat de ky token JWT (toi thieu 256 bits / 32 ky tu)
 backend.warehouse.app.jwtSecret=${JWT_SECRET:your_jwt_secret_key_here}
 backend.warehouse.app.jwtExpirationMs=86400000
+
+# ------------------------------------------------------------------------------
+# CORS
+# ------------------------------------------------------------------------------
+app.cors.allowed-origins=${ALLOWED_ORIGINS:http://localhost:3000}
+
+# ------------------------------------------------------------------------------
+# Cloudflare R2 Storage (S3-compatible)
+# Lay thong tin tai: Cloudflare Dashboard → R2 → Manage R2 API Tokens
+# ------------------------------------------------------------------------------
+# Account ID: Cloudflare Dashboard → phai goc → Account ID
+r2.account-id=${R2_ACCOUNT_ID:your-cloudflare-account-id}
+
+# R2 API Token (tao tai R2 → Manage API Tokens → Create API Token)
+r2.access-key=${R2_ACCESS_KEY:your-r2-access-key-id}
+r2.secret-key=${R2_SECRET_KEY:your-r2-secret-access-key}
+
+# Ten bucket da tao trong R2
+r2.bucket=${R2_BUCKET:your-bucket-name}
