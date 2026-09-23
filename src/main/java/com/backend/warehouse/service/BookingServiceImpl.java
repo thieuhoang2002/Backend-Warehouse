@@ -152,10 +152,7 @@ public class BookingServiceImpl implements BookingService {
 
 	    return bookingDTOs;
 	}
-	
 
-	Path uploadPath = Paths.get(uploadDir);
-	
 	@Override
 	@Transactional
 	public Booking updateBooking(String id, String email, String phoneNumber, String fullName, String filePath) throws IOException {
