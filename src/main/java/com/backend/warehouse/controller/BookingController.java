@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.warehouse.payload.response.BookingResponse;
 import com.backend.warehouse.payload.response.MessageResponse;
+import com.backend.warehouse.repository.BookingRepository;
 import com.backend.warehouse.service.BookingServiceImpl;
 import com.backend.warehouse.service.ItemServiceImpl;
 import com.backend.warehouse.service.R2StorageService;
@@ -35,6 +36,9 @@ public class BookingController {
 
 	@Autowired
 	private ItemServiceImpl itemService;
+
+	@Autowired
+	private BookingRepository bookingRepository;
 
 	@Autowired
 	private R2StorageService r2StorageService;
@@ -114,9 +118,29 @@ public class BookingController {
   @DeleteMapping("/delete/{id}")
   public ResponseEntity<?> deleteBooking(@PathVariable("id") String id) {
       try {
-          itemService.deleteItemsByBookingId(parseId(id));
+          Long bookingId = parseId(id);
 
-          bookingService.deleteBookingById(parseId(id));
+          // Lấy R2 key trước khi xóa booking khỏi DB
+          String r2Key = bookingRepository.findById(bookingId)
+                  .map(b -> b.getExcelFile())
+                  .orElse(null);
+
+          // Xóa items liên quan
+          itemService.deleteItemsByBookingId(bookingId);
+
+          // Xóa booking khỏi DB
+          bookingService.deleteBookingById(bookingId);
+
+          // Xóa file CSV khỏi Cloudflare R2
+          if (r2Key != null && !r2Key.isBlank()) {
+              try {
+                  r2StorageService.deleteFile(r2Key);
+                  System.out.println("[Booking] Đã xóa file R2: " + r2Key);
+              } catch (Exception e) {
+                  // Không fail cả request nếu R2 xóa lỗi (ví dụ: file đã bị xóa thủ công)
+                  System.err.println("[Booking] Warning: Không thể xóa file R2 '" + r2Key + "': " + e.getMessage());
+              }
+          }
 
           return ResponseEntity.ok(new MessageResponse("Xóa booking và các item liên quan thành công!"));
       } catch (Exception e) {
