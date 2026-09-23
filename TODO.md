@@ -95,3 +95,49 @@
 - [ ] QR code cho từng ngăn kệ — quét để xem thông tin
 - [ ] Audit Log — lưu lịch sử thao tác của từng user
 - [ ] Multi-warehouse support với phân quyền theo kho
+
+---
+
+## ⚙️ Tính Năng Cấu Hình Hệ Thống (Admin Panel) — Đề Xuất Mới
+
+> Mục tiêu: Admin có UI tập trung để xem & quản lý hệ thống mà không cần truy cập DB hay file config.
+
+### 👤 Module 1: Quản Lý Tài Khoản Nhân Viên
+**Route:** `GET/POST/PUT /api/admin/users`
+
+- [ ] `GET  /api/admin/users` — Danh sách tất cả users (id, username, profileName, email, role)
+- [ ] `POST /api/admin/users` — Tạo tài khoản nhân viên mới (dùng lại SignupRequest)
+- [ ] `PUT  /api/admin/users/{id}/role` — Đổi role (ADMIN ↔ STAFF)
+- [ ] `PUT  /api/admin/users/{id}/reset-password` — Admin reset mật khẩu cho nhân viên
+- [ ] `PUT  /api/admin/users/{id}/disable` — Vô hiệu hóa tài khoản (thêm field `enabled` vào User)
+
+### 🏭 Module 2: Quản Lý Kho & Kệ
+**Route:** đã có `/api/warehouse`, `/api/shelf` — cần thêm UI frontend
+
+- [ ] Frontend: form tạo warehouse mới (tên, địa chỉ)
+- [ ] Frontend: form tạo shelf mới (tên, loại, tọa độ X/Y/Z, chọn warehouse)
+- [ ] Frontend: danh sách warehouse + số kệ, số ngăn trong mỗi kho
+- [ ] `DELETE /api/warehouse/{id}` — Xóa kho (chỉ khi không còn hàng)
+- [ ] `DELETE /api/shelf/{id}` — Xóa kệ (chỉ khi không còn hàng)
+
+### 🔔 Module 3: Cấu Hình Thông Báo
+**Route:** `GET/PUT /api/admin/config`
+
+- [ ] `GET /api/admin/config` — Lấy cấu hình hiện tại
+- [ ] `PUT /api/admin/config` — Cập nhật cấu hình:
+  - `checkoutReminderDays` — cảnh báo trước X ngày khi sắp đến hạn xuất (mặc định 3)
+  - `maxStorageDays` — số ngày tối đa lưu kho trước khi forced checkout (mặc định 30)
+
+### 📊 Module 4: Thông Tin Hệ Thống (Read-only)
+**Route:** `GET /api/admin/system-info`
+
+- [ ] Trả về: tổng users, tổng kho, tổng kệ, tổng ngăn, tổng items đang lưu
+- [ ] Tên môi trường (local / staging / production từ `spring.profiles.active`)
+- [ ] Thời gian server khởi động
+
+### Frontend Pages Cần Tạo
+- [ ] `/admin/users` — Trang quản lý tài khoản
+- [ ] `/admin/warehouses` — Trang quản lý kho & kệ
+- [ ] `/admin/config` — Trang cấu hình thông báo
+- [ ] `/admin/system` — Trang thông tin hệ thống
+- [ ] Sidebar menu "Cấu hình" chỉ hiện với ADMIN role
