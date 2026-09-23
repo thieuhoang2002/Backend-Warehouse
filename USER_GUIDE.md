@@ -15,7 +15,8 @@
 7. [Xem thông báo](#7-xem-thông-báo)
 8. [In báo cáo và phiếu](#8-in-báo-cáo-và-phiếu)
 9. [Tìm kiếm hàng hóa](#9-tìm-kiếm-hàng-hóa)
-10. [Câu hỏi thường gặp](#10-câu-hỏi-thường-gặp)
+10. [Chức năng dành cho Quản trị viên (Admin)](#10-chức-năng-dành-cho-quản-trị-viên-admin)
+11. [Câu hỏi thường gặp](#11-câu-hỏi-thường-gặp)
 
 ---
 
@@ -205,7 +206,28 @@ Cần tìm một mặt hàng cụ thể? Dùng thanh tìm kiếm:
 
 ---
 
-## 10. Câu Hỏi Thường Gặp
+## 10. Chức Năng Dành Cho Quản Trị Viên (Admin)
+
+Nếu bạn đăng nhập bằng tài khoản có quyền **ROLE_ADMIN** (ví dụ tài khoản `admin`), trên thanh menu sẽ xuất hiện mục **"Quản Trị Viên"**:
+
+### 10.1 Quản lý tài khoản nhân viên
+* **Xem danh sách:** Xem toàn bộ nhân viên trong hệ thống và vai trò (Admin hoặc Nhân viên).
+* **Tạo tài khoản mới:** Thêm tài khoản mới cấp cho nhân viên vận hành kho.
+* **Sửa thông tin / Đổi vai trò:** Cập nhật họ tên, email hoặc nâng/hạ quyền hạn (ADMIN ↔ NHÂN VIÊN).
+* **Đặt lại mật khẩu:** Cấp lại mật khẩu mới cho nhân viên khi quên mật khẩu.
+* **Xóa tài khoản:** Xóa tài khoản nhân viên đã nghỉ việc (hệ thống tự động chặn tự xóa chính mình).
+
+### 10.2 Quản lý Kho & Kệ Hàng
+* **Quản lý Kho:** Xem danh sách các kho hàng, số lượng kệ và số ngăn có hàng; thêm kho mới hoặc sửa địa chỉ.
+* **Quản lý Kệ:** Xem danh sách kệ hàng, tọa độ 3D và số ngăn. Có thể tạo thêm dãy kệ mới (chọn kho, loại hàng, tọa độ X/Y/Z) và hệ thống sẽ tự động tạo sẵn các ngăn trống cho kệ.
+* **Xóa an toàn:** Hệ thống sẽ tự động chặn việc xóa Kho hoặc Kệ nếu bên trong vẫn còn hàng hóa chưa xuất.
+
+### 10.3 Thông tin hệ thống
+* Thống kê trực quan toàn bộ số liệu: Tổng số tài khoản, đơn booking, sản phẩm, kho hàng, kệ hàng, ngăn chứa và lịch sử xuất kho.
+
+---
+
+## 11. Câu Hỏi Thường Gặp
 
 **❓ Tôi upload file CSV nhưng báo lỗi?**
 > Kiểm tra lại:

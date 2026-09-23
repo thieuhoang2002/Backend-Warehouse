@@ -147,5 +147,16 @@
 - [x] `/admin` (Tab: Thông tin hệ thống) — Thống kê các chỉ số bằng thẻ số liệu trực quan
 - [x] Sidebar navigation & menu "Quản Trị Viên" trên Navbar (chỉ hiển thị với ROLE_ADMIN)
 - [ ] `/admin` (Tab: Cấu hình quy tắc vận hành)
+## 🚀 Deploy & CI/CD
 
+- [x] Dockerfile multi-stage (Build: JDK 21 Alpine → Runtime: JRE Alpine)
+- [x] JVM flags tối ưu cho Render Free (512MB): `-Xms128m -Xmx350m -XX:+UseSerialGC`
+- [x] `-Djava.awt.headless=true` — Fix JasperReports trên môi trường headless (Linux server)
+- [x] `server.port=${PORT:8080}` — Tự động dùng PORT của Render
+- [x] `GET /api/auth/health` — Endpoint health check cho cron-job.org anti-sleep ping
+- [x] Backend deploy thành công lên Render.com: `https://wms-backend-iu98.onrender.com`
+- [x] Cron-job.org ping `/api/auth/health` mỗi 10 phút — chống Render ngủ đông
+- [x] Frontend deploy lên Vercel với `.env.production` trỏ về Render backend
+- [x] TiDB Cloud (MySQL-compatible) dùng làm production database
+- [ ] GitHub Actions CI/CD pipeline (tự động test + build khi push)
 

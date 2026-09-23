@@ -1,4 +1,5 @@
 spring.application.name=Backend-Warehouse
+server.port=${PORT:8080}
 
 # ------------------------------------------------------------------------------
 # Database Configuration (MySQL / TiDB)

@@ -97,22 +97,44 @@ git push origin main
    - **Instance Type:** Free
 
 ### Bước 3: Cấu hình Environment Variables
-Vào tab **Environment** → thêm 5 biến:
+Vào tab **Environment** → thêm các biến sau:
 
-| Key | Value |
-|-----|-------|
-| `DB_URL` | `jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/warehouse?useSSL=true&requireSSL=true` |
-| `DB_USERNAME` | _(lấy từ TiDB Cloud)_ |
-| `DB_PASSWORD` | _(lấy từ TiDB Cloud)_ |
-| `JWT_SECRET` | _(chuỗi ngẫu nhiên >= 32 ký tự)_ |
-| `ALLOWED_ORIGINS` | `https://your-frontend.netlify.app,http://localhost:3000` |
+| Key | Value mẫu | Ghi chú |
+|-----|-----------|---------|
+| `DB_URL` | `jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/warehouse?useSSL=true&requireSSL=true` | JDBC URL từ TiDB Cloud |
+| `DB_USERNAME` | `3Pxxxxxxxx.root` | Tên đăng nhập TiDB |
+| `DB_PASSWORD` | `your-db-password` | Mật khẩu TiDB |
+| `JWT_SECRET` | `chuoi-ngau-nhien-bao-mat-lon-hon-32-ky-tu` | Ký JWT Token |
+| `ALLOWED_ORIGINS` | `https://your-frontend.vercel.app,http://localhost:3000` | URL Frontend được phép gọi CORS |
+| `R2_ACCOUNT_ID` | `<cloudflare-account-id>` | Cloudflare Account ID |
+| `R2_ACCESS_KEY` | `<r2-access-key-id>` | Cloudflare R2 Access Key ID |
+| `R2_SECRET_KEY` | `<r2-secret-access-key>` | Cloudflare R2 Secret Access Key |
+| `R2_BUCKET` | `warehouse` | Tên Cloudflare R2 Bucket |
 
 ### Bước 4: Deploy
-Render tự động build Docker image và deploy. Theo dõi log trong tab **Logs**.
+Render tự động build Docker image (multi-stage) và deploy. Theo dõi tiến độ trong tab **Logs**.
 
-**URL sau khi deploy:** `https://your-service-name.onrender.com`
+**URL sau khi deploy:** `https://wms-backend-iu98.onrender.com`
 
-> ⚠️ **Render Free tier:** Service sẽ sleep sau 15 phút không có request. Request đầu tiên sau khi ngủ mất ~30 giây để wake up.
+
+---
+
+## 4.1. ⏰ Chống Ngủ Đông Trên Render (Cron-job.org)
+
+Render Free Tier sẽ tự động **ngủ đông (sleep/spin-down)** nếu không có request trong vòng **15 phút**. Khi có người dùng truy cập, service mất ~30-50 giây để khởi động lại.
+
+**Giải pháp miễn phí 100%:** Sử dụng [cron-job.org](https://cron-job.org) để tự động ping giữ ấm backend.
+
+1. Đăng ký tài khoản miễn phí tại **[cron-job.org](https://cron-job.org)**.
+2. Bấm **Create Cronjob**.
+3. Điền thông tin:
+   - **Title:** `Keep-Alive WMS Backend`
+   - **URL:** `https://wms-backend-iu98.onrender.com/api/auth/health`
+   - **Execution schedule:** Chọn **Every 10 minutes** (mỗi 10 phút ping 1 lần, trước mốc 15 phút của Render).
+   - **Request method:** `GET`
+4. Bấm **Create**.
+5. **Kết quả:** Service Render của bạn sẽ luôn hoạt động liên tục 24/7 mà không bị rơi vào trạng thái ngủ đông!
+
 
 ---
 

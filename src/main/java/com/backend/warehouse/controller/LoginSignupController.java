@@ -92,5 +92,19 @@ public class LoginSignupController {
 		long userCount = userRepository.count();
 		return ResponseEntity.ok(userCount);
 	}
+
+	/**
+	 * Endpoint Health Check cong khai (khong can JWT token).
+	 * Su dung cho Render liveness probe hoac cron-job.org ping dinh ky chong ngu dong.
+	 */
+	@GetMapping("/health")
+	public ResponseEntity<?> healthCheck() {
+		return ResponseEntity.ok(java.util.Map.of(
+			"status", "UP",
+			"service", "WMS-Backend",
+			"timestamp", System.currentTimeMillis()
+		));
+	}
 }
+
 
