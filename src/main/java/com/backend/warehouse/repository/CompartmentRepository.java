@@ -23,6 +23,10 @@ public interface CompartmentRepository extends JpaRepository<Compartment, Long> 
 
     List<Compartment> findByItem_ItemId(Long itemId);
 
+    List<Compartment> findByShelf_ShelfId(Long shelfId);
+
+    long countByShelf_ShelfId(Long shelfId);
+
     // Pessimistic lock - dùng cho checkout để tránh race condition
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT c FROM Compartment c WHERE c.compId = :id")

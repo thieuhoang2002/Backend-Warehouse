@@ -112,12 +112,14 @@
 - [x] `DELETE /api/admin/users/{id}` — Xóa người dùng (chặn tự xóa bản thân)
 
 ### 🏭 Module 2: Quản Lý Kho & Kệ
-**Route:** đã có `/api/warehouse`, `/api/shelf` — cần thêm UI frontend
-- [ ] Frontend: form tạo warehouse mới (tên, địa chỉ)
-- [ ] Frontend: form tạo shelf mới (tên, loại, tọa độ X/Y/Z, chọn warehouse)
-- [ ] Frontend: danh sách warehouse + số kệ, số ngăn trong mỗi kho
-- [ ] `DELETE /api/warehouse/{id}` — Xóa kho (chỉ khi không còn hàng)
-- [ ] `DELETE /api/shelf/{id}` — Xóa kệ (chỉ khi không còn hàng)
+**Route:** `GET/POST/PUT/DELETE /api/admin/warehouses`, `GET/POST/DELETE /api/admin/shelves`
+- [x] Backend: Thống kê số lượng kệ, ngăn, hàng hóa cho từng kho (`GET /api/admin/warehouses`)
+- [x] Backend: Tạo kho mới, cập nhật tên/địa chỉ kho (`POST/PUT /api/admin/warehouses`)
+- [x] Backend: Tạo kệ mới kèm tọa độ 3D (X, Y, Z) và tự động sinh các tầng/ngăn ban đầu (`POST /api/admin/shelves`)
+- [x] Backend: Ràng buộc an toàn — Chặn xóa Kho/Kệ nếu còn ngăn chứa hàng hóa
+- [x] Frontend: Tab Quản lý Kho — Xem danh sách thẻ kho, thêm kho, sửa kho, xóa an toàn
+- [x] Frontend: Tab Quản lý Kệ — Bảng danh sách kệ, tọa độ 3D, số ngăn, trạng thái hàng, thêm kệ mới, xóa kệ
+
 
 ### 🔔 Module 3: Cấu Hình Thông Báo
 **Route:** `GET/PUT /api/admin/config`
@@ -134,8 +136,8 @@
 
 ### Frontend Pages
 - [x] `/admin` (Tab: Quản lý nhân viên) — Bảng danh sách, tạo mới, sửa, đổi pass, xóa
+- [x] `/admin` (Tab: Quản lý kho & kệ) — Quản lý kho hàng & kệ hàng, tọa độ 3D, sinh ngăn tự động
 - [x] `/admin` (Tab: Thông tin hệ thống) — Thống kê các chỉ số bằng thẻ số liệu trực quan
 - [x] Sidebar navigation & menu "Quản Trị Viên" trên Navbar (chỉ hiển thị với ROLE_ADMIN)
-- [ ] `/admin` (Tab: Quản lý kho & kệ)
-- [ ] `/admin` (Tab: Cấu hình hệ thống)
+- [ ] `/admin` (Tab: Cấu hình quy tắc vận hành)
 
