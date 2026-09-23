@@ -25,6 +25,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Random;
@@ -48,6 +49,7 @@ public class BookingServiceImpl implements BookingService {
 	private final String uploadDir = "uploads/";
 	
 	@Override
+	@Transactional
 	public void saveFormData(MultipartFile file) throws IOException, java.io.IOException {
 
 		Path uploadPath = Paths.get(uploadDir);
@@ -186,6 +188,7 @@ public class BookingServiceImpl implements BookingService {
 	Path uploadPath = Paths.get(uploadDir);
 	
 	@Override
+	@Transactional
 	public Booking updateBooking(String id, String email, String phoneNumber, String fullName, String filePath) throws IOException {
 	Booking booking = bookingRepository.findById(parseId(id))
 	      .orElseThrow(() -> new RuntimeException("Không tìm thấy booking với ID: " + id));
@@ -200,9 +203,10 @@ public class BookingServiceImpl implements BookingService {
 
 	public Long getTotalCustomers() {
         Long totalCustomers = bookingRepository.countTotalCustomers();
-        return totalCustomers != null ? totalCustomers : 0;  // Đảm bảo trả về 0 nếu không có khách hàng nào
+        return totalCustomers != null ? totalCustomers : 0;
     }
-	
+
+	@Transactional
 	public void deleteBookingById(Long id) {
         bookingRepository.deleteById(id);
     }

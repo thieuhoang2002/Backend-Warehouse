@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.warehouse.entity.Booking;
 import com.backend.warehouse.entity.Compartment;
@@ -102,6 +103,7 @@ public class ItemServiceImpl implements ItemService{
     }
    
 	@Override
+	@Transactional
 	public Item updateItem(String id, String name, int quantity, String status, LocalDate checkin, LocalDate checkout, String delivery, Float weight) throws IOException {
 	Item item = itemRepository.findById(parseId(id))
 	      .orElseThrow(() -> new RuntimeException("Không tìm thấy item với ID: " + id));
@@ -222,9 +224,10 @@ public class ItemServiceImpl implements ItemService{
         return monthlyItemCounts;
     }
 	
-	 public void deleteItemsByBookingId(Long bookingId) {
-	        itemRepository.deleteByBookingId(bookingId);
-	    }
+	@Transactional
+	public void deleteItemsByBookingId(Long bookingId) {
+	    itemRepository.deleteByBookingId(bookingId);
+	}
 	 
 	 
 	 @Override

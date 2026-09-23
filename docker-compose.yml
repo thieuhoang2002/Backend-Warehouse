@@ -1,0 +1,40 @@
+services:
+  wms-db:
+    image: mysql:8.0
+    container_name: wms-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: warehouse
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3307:3306"   # 3307 tren host de khong dung XAMPP port 3306
+    volumes:
+      - wms-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+
+  wms-backend:
+    build: .
+    container_name: wms-backend
+    restart: unless-stopped
+    depends_on:
+      wms-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://wms-db:3306/warehouse?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+      JWT_SECRET: local-docker-compose-secret-key-change-in-prod
+      ALLOWED_ORIGINS: http://localhost:3000
+    volumes:
+      - wms-uploads:/app/uploads
+
+volumes:
+  wms-db-data:
+  wms-uploads:

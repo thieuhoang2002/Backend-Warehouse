@@ -1,7 +1,5 @@
 package com.backend.warehouse.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,14 +7,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.backend.warehouse.entity.User;
+import com.backend.warehouse.entity.UserRole;
 import com.backend.warehouse.payload.request.LoginRequest;
 import com.backend.warehouse.payload.request.SignupRequest;
 import com.backend.warehouse.payload.response.JwtResponse;
@@ -27,11 +21,10 @@ import com.backend.warehouse.service.UserDetailsImpl;
 
 import jakarta.validation.Valid;
 
-
-@CrossOrigin(origins = {"http://localhost:3000", "https://webapp-warehouse3d.netlify.app"}, maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class LoginSignupController {
+
 	@Autowired
 	AuthenticationManager authenticationManager;
 
@@ -46,50 +39,52 @@ public class LoginSignupController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
-		Optional<User> checkLogin = userRepository.findByUser(loginRequest.getUsername());
-		if (checkLogin.isPresent()) {
-			User user = checkLogin.get();
-			if (encoder.matches(loginRequest.getPassword(), user.getPassword())) {
-
-				Authentication authentication = authenticationManager.authenticate(
-						new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-				String jwt = jwtUtils.generateJwtToken(authentication);
-
-				UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-				return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUserid(), userDetails.getUsername(),
-						userDetails.getProfile_name(), userDetails.getEmail()));
-			} else {
-				return ResponseEntity.badRequest().body(new MessageResponse("Error: Mật khẩu không đúng!"));
-			}
-		} else {
+		if (!userRepository.findByUsername(loginRequest.getUsername()).isPresent()) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Tài khoản không tồn tại!"));
 		}
 
+		User user = userRepository.findByUsername(loginRequest.getUsername()).get();
+		if (!encoder.matches(loginRequest.getPassword(), user.getPassword())) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Mật khẩu không đúng!"));
+		}
+
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		String jwt = jwtUtils.generateJwtToken(authentication);
+
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUserid(), userDetails.getUsername(),
+				userDetails.getProfile_name(), userDetails.getEmail()));
 	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-
-		Optional<User> userCheck = userRepository.existsByUser(signUpRequest.getUsername());
-		if (!userCheck.isEmpty()) {
+		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Tài khoản này đã tồn tại!"));
 		}
 
-		// Create new user's account
-		User user = new User(signUpRequest.getUsername(), encoder.encode(signUpRequest.getPassword()),
-				signUpRequest.getProfileName(), signUpRequest.getEmail());
+		UserRole role = UserRole.ROLE_STAFF;
+		if ("ADMIN".equalsIgnoreCase(signUpRequest.getRole())) {
+			role = UserRole.ROLE_ADMIN;
+		}
 
-
+		User user = new User(
+			signUpRequest.getUsername(),
+			encoder.encode(signUpRequest.getPassword()),
+			signUpRequest.getProfileName(),
+			signUpRequest.getEmail(),
+			role
+		);
 		userRepository.save(user);
-
 		return ResponseEntity.ok(new MessageResponse("Đăng ký thành công!"));
 	}
+
 	@GetMapping("/countUsers")
 	public ResponseEntity<Long> countUsers() {
-	    long userCount = userRepository.count();
-	    return ResponseEntity.ok(userCount);
+		long userCount = userRepository.count();
+		return ResponseEntity.ok(userCount);
 	}
 }
+

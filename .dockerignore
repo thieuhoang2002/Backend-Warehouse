@@ -1,0 +1,11 @@
+﻿**/.git
+**/.gitignore
+**/target/
+**/.idea/
+**/.vscode/
+**/.classpath
+**/.project
+**/.settings/
+**/*.iml
+**/uploads/
+**/src/main/resources/application.properties

@@ -3,7 +3,6 @@ package com.backend.warehouse.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,113 +12,79 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.backend.warehouse.entity.User;
 
 public class UserDetailsImpl implements UserDetails {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Long userid;
+    private Long userid;
+    private String username;
 
-	private String username;
+    @JsonIgnore
+    private String password;
 
-	@JsonIgnore
-	private String password;
+    private String profile_name;
+    private String email;
+    private String role;
 
-	private String profile_name;
-	
-	private String email;
+    private Collection<? extends GrantedAuthority> authorities;
 
+    public UserDetailsImpl(Long id, String username, String password, String profile_name, String email,
+            String role, Collection<? extends GrantedAuthority> authorities) {
+        this.userid = id;
+        this.username = username;
+        this.password = password;
+        this.profile_name = profile_name;
+        this.email = email;
+        this.role = role;
+        this.authorities = authorities;
+    }
 
-	private Collection<? extends GrantedAuthority> authorities;
+    public static UserDetailsImpl build(User user) {
+        List<GrantedAuthority> authorities = List.of(
+            new SimpleGrantedAuthority(user.getRole().name())
+        );
+        return new UserDetailsImpl(
+            user.getUserId(),
+            user.getUsername(),
+            user.getPassword(),
+            user.getProfileName(),
+            user.getEmail(),
+            user.getRole().name(),
+            authorities
+        );
+    }
 
-	public UserDetailsImpl(Long id, String username, String password, String profile_name, String email,
-			Collection<? extends GrantedAuthority> authorities) {
-		this.userid = id;
-		this.username = username;
-		this.password = password;
-		this.profile_name = profile_name;
-		this.email = email;
-		this.authorities = authorities;
-	}
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }
 
-	public static UserDetailsImpl build(User user) {
-//		List<GrantedAuthority> authorities = user.getRoles().stream()
-//				.map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
+    public Long getUserid() { return userid; }
+    public void setUserid(Long userid) { this.userid = userid; }
 
-		return new UserDetailsImpl(user.getUserId(), user.getUsername(), user.getPassword(), user.getProfileName(), user.getEmail(),
-				null);
-	}
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return authorities;
-	}
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-	public Long getUserid() {
-		return userid;
-	}
+    @Override
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-	public void setUserid(Long userid) {
-		this.userid = userid;
-	}
+    @Override
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getProfile_name() { return profile_name; }
+    public void setProfile_name(String profile_name) { this.profile_name = profile_name; }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getProfile_name() {
-		return profile_name;
-	}
-
-	public void setProfile_name(String profile_name) {
-		this.profile_name = profile_name;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		UserDetailsImpl user = (UserDetailsImpl) o;
-		return Objects.equals(userid, user.userid);
-	}
-
-	@Override
-	public String getUsername() {
-		return username;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserDetailsImpl user = (UserDetailsImpl) o;
+        return Objects.equals(userid, user.userid);
+    }
 }

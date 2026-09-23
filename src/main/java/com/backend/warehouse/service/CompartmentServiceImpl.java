@@ -2,6 +2,8 @@ package com.backend.warehouse.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -64,6 +66,7 @@ public class CompartmentServiceImpl implements CompartmentService {
 	}
 
 	@Override
+	@Transactional
 	public Compartment saveCompartment(Long shelfId, Compartment compartment) {
 		Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(() -> new RuntimeException("Shelf not found"));
 
@@ -80,8 +83,9 @@ public class CompartmentServiceImpl implements CompartmentService {
 	}
 
 	@Override
+	@Transactional
 	public MessageResponse addItemToCompartment(Long compartmentId, Long itemId, int quantity) {
-	    Compartment compartment = compartmentRepository.findById(compartmentId).orElse(null);
+	    Compartment compartment = compartmentRepository.findByIdWithLock(compartmentId).orElse(null);
 
 	    if (compartment == null) {
 	        return new MessageResponse("Error: Compartment không tồn tại!");
@@ -123,6 +127,7 @@ public class CompartmentServiceImpl implements CompartmentService {
 	}
 
 	@Override
+	@Transactional
 	public MessageResponse updateItemQuantity(Long compartmentId, Long itemId, int quantity) {
 	    Compartment compartment = compartmentRepository.findById(compartmentId).orElse(null);
 
@@ -162,6 +167,7 @@ public class CompartmentServiceImpl implements CompartmentService {
 
 
 	@Override
+	@Transactional
 	public MessageResponse removeItemFromCompartment(Long compartmentId, Long itemId) {
 	    Compartment compartment = compartmentRepository.findById(compartmentId).orElse(null);
 	    if (compartment == null) {
@@ -185,9 +191,13 @@ public class CompartmentServiceImpl implements CompartmentService {
 
 
 	@Override
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public MessageResponse checkoutItem(Long compartmentId, Long itemId, String referenceNo, String delivery) {
 	    // Lấy thông tin user từ token
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication == null || !(authentication.getPrincipal() instanceof UserDetailsImpl)) {
+	        return new MessageResponse("Error: Bạn cần đăng nhập để thực hiện thao tác này!");
+	    }
 	    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 	    Long userId = userDetails.getUserid();
 	    User user = userRepository.findById(userId).orElse(null);
@@ -196,8 +206,8 @@ public class CompartmentServiceImpl implements CompartmentService {
 	        return new MessageResponse("Error: Nhân viên không tồn tại!");
 	    }
 
-	    // Kiểm tra compartment
-	    Compartment compartment = compartmentRepository.findById(compartmentId).orElse(null);
+	    // Kiểm tra compartment với Pessimistic Lock để tránh race condition
+	    Compartment compartment = compartmentRepository.findByIdWithLock(compartmentId).orElse(null);
 	    if (compartment == null) {
 	        return new MessageResponse("Error: Compartment không tồn tại!");
 	    }
@@ -279,6 +289,7 @@ public class CompartmentServiceImpl implements CompartmentService {
 
 	// Hàm xác nhận checkout
 	@Override
+	@Transactional
 	public MessageResponse confirmCheckout(Long recordId) {
 	    CheckoutRecord record = checkoutRecordRepository.findById(recordId).orElse(null);
 	    if (record == null) {
@@ -312,6 +323,7 @@ public class CompartmentServiceImpl implements CompartmentService {
 
 	// Hàm hủy checkout và trả item lại vào compartment
 	@Override
+	@Transactional
 	public MessageResponse cancelCheckout(Long recordId) {
 	    CheckoutRecord record = checkoutRecordRepository.findById(recordId).orElse(null);
 	    if (record == null) {
