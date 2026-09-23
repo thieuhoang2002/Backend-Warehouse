@@ -18,8 +18,11 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * Service để tương tác với Cloudflare R2 (S3-compatible storage).
@@ -97,6 +100,30 @@ public class R2StorageService {
                 .key(key)
                 .build();
         s3Client.deleteObject(deleteRequest);
+    }
+
+    /**
+     * Xóa toàn bộ file trong R2 bucket (dùng khi reset demo).
+     */
+    public void deleteAllObjects() {
+        try {
+            ListObjectsV2Request listRequest = ListObjectsV2Request.builder()
+                    .bucket(bucket)
+                    .build();
+            ListObjectsV2Response listResponse;
+            do {
+                listResponse = s3Client.listObjectsV2(listRequest);
+                for (S3Object s3Object : listResponse.contents()) {
+                    deleteFile(s3Object.key());
+                }
+                listRequest = listRequest.toBuilder()
+                        .continuationToken(listResponse.nextContinuationToken())
+                        .build();
+            } while (Boolean.TRUE.equals(listResponse.isTruncated()));
+            System.out.println("=== [R2StorageService] Đã dọn sạch tất cả objects trong bucket ===");
+        } catch (Exception e) {
+            System.err.println("=== [R2StorageService] Lỗi khi dọn dẹp R2: " + e.getMessage() + " ===");
+        }
     }
 
     /**

@@ -129,6 +129,14 @@
 - [ ] Tên môi trường (local / staging / production từ `spring.profiles.active`)
 - [ ] Thời gian server khởi động (Server Uptime)
 
+### 🔄 Module 5: Tự Động Dọn Rác R2 & Khôi Phục Dữ Liệu Demo — [HOÀN THÀNH]
+**Route:** `POST /api/admin/reset-demo`
+- [x] Backend: `R2StorageService.deleteAllObjects()` quét và dọn sạch các file CSV upload thử nghiệm trên Cloudflare R2
+- [x] Backend: `DemoResetService.resetAll()` xóa toàn bộ dữ liệu DB an toàn và gọi `DataLoader.seedData()` nạp lại dữ liệu chuẩn ban đầu
+- [x] Backend: `DemoResetScheduler` tự động kích hoạt vào lúc 02:00 sáng hàng ngày (`Asia/Ho_Chi_Minh`)
+- [x] Backend: `POST /api/admin/reset-demo` cho phép Quản trị viên kích hoạt khôi phục demo thủ công
+- [x] Frontend: Thẻ thông tin cơ chế tự động 24h + Nút "Khôi phục dữ liệu Demo" kèm Dialog xác nhận trên Tab Thông tin hệ thống
+
 ---
 
 ## 💡 Tính Năng Tương Lai (Nice to Have)

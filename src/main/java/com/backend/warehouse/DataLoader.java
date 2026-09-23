@@ -38,7 +38,11 @@ public class DataLoader implements ApplicationRunner {
             System.out.println("=== [DataLoader] DB đã có dữ liệu, bỏ qua seed. ===");
             return;
         }
+        seedData();
+    }
 
+    @Transactional
+    public void seedData() {
         System.out.println("=== [DataLoader] Đang tạo dữ liệu mẫu... ===");
 
         // =====================================================================

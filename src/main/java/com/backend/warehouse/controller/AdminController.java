@@ -321,5 +321,14 @@ public class AdminController {
         info.put("totalCheckouts",   checkoutRecordRepository.count());
         return ResponseEntity.ok(info);
     }
+
+    @Autowired private com.backend.warehouse.service.DemoResetService demoResetService;
+
+    /** Khôi phục dữ liệu demo ban đầu và dọn sạch R2 */
+    @PostMapping("/reset-demo")
+    public ResponseEntity<?> resetDemo() {
+        demoResetService.resetAll();
+        return ResponseEntity.ok(new MessageResponse("Đã dọn dẹp R2 và khôi phục toàn bộ dữ liệu demo về trạng thái ban đầu!"));
+    }
 }
 
