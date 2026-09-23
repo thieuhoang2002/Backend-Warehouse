@@ -55,8 +55,14 @@ public class LoginSignupController {
 		String jwt = jwtUtils.generateJwtToken(authentication);
 
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		// Lấy role từ DB (UserDetailsImpl.getAuthorities() trả về GrantedAuthority)
+		String role = userDetails.getAuthorities().stream()
+				.findFirst()
+				.map(a -> a.getAuthority())
+				.orElse("ROLE_STAFF");
+
 		return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUserid(), userDetails.getUsername(),
-				userDetails.getProfile_name(), userDetails.getEmail()));
+				userDetails.getProfile_name(), userDetails.getEmail(), role));
 	}
 
 	@PostMapping("/signup")
