@@ -16,6 +16,7 @@ import com.backend.warehouse.entity.Compartment;
 import com.backend.warehouse.entity.Item;
 import com.backend.warehouse.payload.response.BookingResponse;
 import com.backend.warehouse.payload.response.ItemResponse;
+import com.backend.warehouse.repository.CompartmentRepository;
 import com.backend.warehouse.repository.ItemRepository;
 import com.backend.warehouse.service.ItemService;
 
@@ -26,6 +27,9 @@ public class ItemServiceImpl implements ItemService{
 	
 	 @Autowired
 	 private ItemRepository itemRepository;
+
+	 @Autowired
+	 private CompartmentRepository compartmentRepository;
 
 		public String formatId(Long id) {
 		    if (id < 10) {
@@ -95,11 +99,24 @@ public class ItemServiceImpl implements ItemService{
 	
 	@Override
     public List<Compartment> getCompartmentsByItemId(String itemId) {
-        Item item = itemRepository.findById(parseId(itemId))
-            .orElseThrow(() -> new RuntimeException("Item không tồn tại"));
+        Long id;
+        try {
+            if (itemId == null || itemId.isBlank()) {
+                return List.of();
+            }
+            if (itemId.matches("\\d+")) {
+                id = Long.parseLong(itemId);
+            } else if (itemId.startsWith("SP")) {
+                id = parseId(itemId);
+            } else {
+                return List.of();
+            }
+        } catch (Exception e) {
+            return List.of();
+        }
 
-        // Trả về danh sách compartments của item
-        return item.getCompartments();
+        // Truy vấn trực tiếp từ CompartmentRepository để luôn lấy dữ liệu mới nhất
+        return compartmentRepository.findByItem_ItemId(id);
     }
    
 	@Override
