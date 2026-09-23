@@ -119,21 +119,21 @@ public class DataLoader implements ApplicationRunner {
         booking1.setCustomerEmail("cty.abc@gmail.com");
         booking1.setCustomerName("Công ty TNHH ABC Technology");
         booking1.setNumberphone("0901234567");
-        booking1.setExcelFile("uploads/booking_cty_abc.csv");
+        booking1.setExcelFile("booking_cty_abc.csv");   // R2 key (tên file, không có prefix)
         booking1.setReferenceNo(54321L);
 
         Booking booking2 = new Booking();
         booking2.setCustomerEmail("shop.xyz@gmail.com");
         booking2.setCustomerName("Cửa hàng thời trang XYZ");
         booking2.setNumberphone("0912345678");
-        booking2.setExcelFile("uploads/booking_shop_xyz.csv");
+        booking2.setExcelFile("booking_shop_xyz.csv");  // R2 key
         booking2.setReferenceNo(67890L);
 
         Booking booking3 = new Booking();
         booking3.setCustomerEmail("tdd.food@gmail.com");
         booking3.setCustomerName("Tập đoàn thực phẩm DEF");
         booking3.setNumberphone("0923456789");
-        booking3.setExcelFile("uploads/booking_tdd_food.csv");
+        booking3.setExcelFile("booking_tdd_food.csv");  // R2 key
         booking3.setReferenceNo(11223L);
 
         bookingRepository.saveAll(List.of(booking1, booking2, booking3));
