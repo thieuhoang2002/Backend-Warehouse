@@ -96,52 +96,8 @@
 - [ ] Audit Log — lưu lịch sử thao tác của từng user
 - [ ] Multi-warehouse support với phân quyền theo kho
 
----
 
-### ⚙️ Quản Trị Hệ Thống (`/api/admin`) — Đã Hoàn Thành
-- [x] `GET    /api/admin/users` — Lấy danh sách tất cả tài khoản
-- [x] `POST   /api/admin/users` — Tạo tài khoản mới (Admin / Nhân viên)
-- [x] `PUT    /api/admin/users/{id}` — Cập nhật họ tên, email, vai trò
-- [x] `PUT    /api/admin/users/{id}/reset-password` — Đặt lại mật khẩu
-- [x] `DELETE /api/admin/users/{id}` — Xóa tài khoản (bảo vệ chống tự xóa chính mình)
-- [x] `GET    /api/admin/system-info` — Thống kê tổng quan hệ thống (tổng user, booking, item, kho, kệ, ngăn, checkout)
-- [x] Tích hợp Cloudflare R2 Storage (AWS SDK v2 S3-compatible) cho lưu trữ file CSV lâu dài
-- [x] Tự động xóa file trên R2 khi hủy booking
 
----
-
-## 🔧 Cần Cải Thiện
-
-### Bảo Mật
-- [x] Enforce `@PreAuthorize("hasRole('ROLE_ADMIN')")` trên các route admin
-- [ ] Thêm Rate Limiting (chống brute-force login)
-- [ ] Thêm `@Valid` cho tất cả request body chưa có
-
-### Nghiệp Vụ
-- [ ] Cho phép checkout linh hoạt hơn — hiện tại chỉ được checkout đúng ngày checkout date
-- [ ] Pagination cho `/api/product/all` (hiện tại trả toàn bộ)
-- [ ] Sort/Filter ở Repository layer thay vì in-memory tại Controller
-
-### Code Quality
-- [ ] Viết Unit Tests (Service layer) và Integration Tests (Controller layer)
-- [ ] Thêm `@Slf4j` logging thay thế `System.out.println` trong BookingServiceImpl
-- [ ] Chuẩn hóa error response format (hiện tại mỗi nơi trả lỗi theo cách khác nhau)
-- [ ] Thêm Swagger/OpenAPI documentation (`springdoc-openapi`)
-
-### Performance
-- [ ] Thêm Redis Cache cho các query thường xuyên (getAllProducts, getAllCompartments)
-- [ ] Lazy loading review — tránh N+1 query problem
-
----
-
-## 💡 Tính Năng Tương Lai (Nice to Have)
-
-- [ ] Import/Export Excel (ngoài CSV)
-- [ ] QR code cho từng ngăn kệ — quét để xem thông tin
-- [ ] Audit Log — lưu lịch sử thao tác của từng user
-- [ ] Multi-warehouse support với phân quyền theo kho
-
----
 
 ## ⚙️ Tính Năng Cấu Hình Hệ Thống (Admin Panel) — Tiến Độ
 
