@@ -15,6 +15,11 @@ public class BookingReportDataClient_IdString {
 	private String numberphone;
 	private String excelFile;
 	private Long referenceNo;
+
+	public BookingReportDataClient_IdString() {
+		super();
+	}
+
 	public BookingReportDataClient_IdString(String id, String customerEmail, String customerName, String numberphone,
 			String excelFile, Long referenceNo) {
 		super();

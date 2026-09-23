@@ -23,6 +23,7 @@ import net.sf.jasperreports.engine.xml.JRPenFactory.Style;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -36,7 +37,6 @@ import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.codec.Utf8;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -73,8 +73,11 @@ public class ReportServiceImpl implements ReportService {
 //        );
 
         
-        String path = ResourceUtils.getFile("classpath:reports/ReportVip5.jrxml").getAbsolutePath();
-        JasperReport jasperReport = JasperCompileManager.compileReport(path);
+        InputStream reportStream = getClass().getResourceAsStream("/reports/ReportVip5.jrxml");
+        if (reportStream == null) {
+            throw new FileNotFoundException("Report template not found: /reports/ReportVip5.jrxml");
+        }
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportItems);
         Map<String, Object> parameters = new HashMap<>();
         
@@ -126,8 +129,11 @@ public class ReportServiceImpl implements ReportService {
                                ));
 
         
-        String path = ResourceUtils.getFile("classpath:reports/DeliveryReport_v30.jrxml").getAbsolutePath();
-        JasperReport jasperReport = JasperCompileManager.compileReport(path);
+        InputStream reportStream = getClass().getResourceAsStream("/reports/DeliveryReport_v30.jrxml");
+        if (reportStream == null) {
+            throw new FileNotFoundException("Report template not found: /reports/DeliveryReport_v30.jrxml");
+        }
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportItems);
         Map<String, Object> parameters = new HashMap<>();
         
@@ -149,9 +155,11 @@ public class ReportServiceImpl implements ReportService {
     	BookingReport bookingReport = new BookingReport(customerEmail, customerName, numberphone, referenceNo);
         System.out.println("Booking Data: " + bookingReport.toString());
 
-        String path = ResourceUtils.getFile("classpath:reports/Booking_v8.jrxml").getAbsolutePath();
-        
-        JasperReport jasperReport = JasperCompileManager.compileReport(path);
+        InputStream reportStream = getClass().getResourceAsStream("/reports/Booking_v8.jrxml");
+        if (reportStream == null) {
+            throw new FileNotFoundException("Report template not found: /reports/Booking_v8.jrxml");
+        }
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
         
         List<BookingReport> bookingList = Collections.singletonList(bookingReport);
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(bookingList);
@@ -196,8 +204,11 @@ public class ReportServiceImpl implements ReportService {
                                ));
 
         
-        String path = ResourceUtils.getFile("classpath:reports/CheckoutItemReport_v19.jrxml").getAbsolutePath();
-        JasperReport jasperReport = JasperCompileManager.compileReport(path);
+        InputStream reportStream = getClass().getResourceAsStream("/reports/CheckoutItemReport_v19.jrxml");
+        if (reportStream == null) {
+            throw new FileNotFoundException("Report template not found: /reports/CheckoutItemReport_v19.jrxml");
+        }
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportItems);
         Map<String, Object> parameters = new HashMap<>();
         

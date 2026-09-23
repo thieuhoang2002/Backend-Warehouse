@@ -61,12 +61,8 @@ public class ReportController {
             headers.setContentType(MediaType.APPLICATION_PDF);
 
             return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
-        } catch (FileNotFoundException e) {
-            // Trả về một mảng byte rỗng khi không tìm thấy file
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new byte[0]);
-        } catch (JRException e) {
-            // Trả về một mảng byte rỗng khi xảy ra lỗi trong quá trình tạo báo cáo
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new byte[0]);
         }
@@ -83,30 +79,39 @@ public class ReportController {
             headers.setContentType(MediaType.APPLICATION_PDF);
 
             return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
-        } catch (FileNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new byte[0]);
-        } catch (JRException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new byte[0]);
         }
     }
     
 	public Long parseId(String formattedId) {
-	    if (formattedId.startsWith("BK")) {
+		if (formattedId == null || formattedId.trim().isEmpty()) {
+			return null;
+		}
+		formattedId = formattedId.trim();
+	    if (formattedId.toUpperCase().startsWith("BK")) {
 	        String numericPart = formattedId.substring(2); 
-	        return Long.parseLong(numericPart);
-	    } else {
-	        throw new IllegalArgumentException("Invalid formatted ID: " + formattedId);
+	        try {
+	            return Long.parseLong(numericPart);
+	        } catch (NumberFormatException e) {
+	            return null;
+	        }
+	    }
+	    try {
+	        return Long.parseLong(formattedId);
+	    } catch (NumberFormatException e) {
+	        return null;
 	    }
 	}
     
     @PostMapping("/generate-pdf-booking")
     public ResponseEntity<byte[]> generatePdfBooking(@RequestBody BookingReportDataClient_IdString bookingReportDataIdString) {
         try {
-        	
+            Long bookingId = parseId(bookingReportDataIdString.getId());
         	BookingReportDataClient bookingReportData = new BookingReportDataClient(
-        			parseId(bookingReportDataIdString.getId()),
+        			bookingId,
         			bookingReportDataIdString.getCustomerEmail(),
         			bookingReportDataIdString.getCustomerName(),
         			bookingReportDataIdString.getNumberphone(),
@@ -121,10 +126,8 @@ public class ReportController {
             headers.setContentType(MediaType.APPLICATION_PDF);
 
             return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
-        } catch (FileNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new byte[0]);
-        } catch (JRException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new byte[0]);
         }
@@ -141,10 +144,8 @@ public class ReportController {
             headers.setContentType(MediaType.APPLICATION_PDF);
 
             return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
-        } catch (FileNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new byte[0]);
-        } catch (JRException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new byte[0]);
         }
